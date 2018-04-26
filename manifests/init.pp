@@ -11,12 +11,12 @@
 #     owner     => 'me',
 #     group     => 'us',
 #    }
-define recursive_file_permissions(
-  String           $target_dir  = $title,
-  Optional[String] $file_mode   = undef,
-  Optional[String] $dir_mode    = undef,
-  Optional[String] $owner       = undef,
-  Optional[String] $group       = undef,
+define recursive_file_permissions (
+  Recursive_file_permissions::Unixpath           $target_dir  = $title,
+  Optional[Recursive_file_permissions::Filemode] $file_mode   = undef,
+  Optional[Recursive_file_permissions::Filemode] $dir_mode    = undef,
+  Optional[String[1]]                            $owner       = undef,
+  Optional[String[1]]                            $group       = undef,
 ) {
 
   if $facts['os']['family'] == 'windows' {
