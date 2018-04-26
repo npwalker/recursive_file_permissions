@@ -1,13 +1,11 @@
 {
-  "name": "npwalker-file_permissions",
-  "version": "0.1.0",
+  "name": "npwalker-recursive_file_permissions",
+  "version": "0.5.0",
   "author": "npwalker",
-  "summary": "",
+  "summary": "Puppet defined types and functions for managing permissions on large amounts of files",
   "license": "Apache-2.0",
-  "source": "",
-  "dependencies": [
-
-  ],
+  "source": "https://github.com/npwalker/recursive_file_permissions",
+  "dependencies": [],
   "operatingsystem_support": [
     {
       "operatingsystem": "CentOS",
@@ -67,7 +65,7 @@
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 4.7.0 < 6.0.0"
+      "version_requirement": ">= 3.0.0 < 6.0.0"
     }
   ],
   "pdk-version": "1.4.1",
