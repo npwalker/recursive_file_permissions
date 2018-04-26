@@ -11,13 +11,12 @@
 #     owner     => 'me',
 #     group     => 'us',
 #    }
-#
-define recursive_file_permissions (
-  Recursive_file_permissions::Unixpath           $target_dir  = $title,
-  Optional[Recursive_file_permissions::Filemode] $file_mode   = undef,
-  Optional[Recursive_file_permissions::Filemode] $dir_mode    = undef,
-  Optional[String[1]]                            $owner       = undef,
-  Optional[String[1]]                            $group       = undef,
+define recursive_file_permissions(
+  Recursive_file_permissions::Unixpath           $target_dir = $title,
+  Optional[Recursive_file_permissions::Filemode] $file_mode  = undef,
+  Optional[Recursive_file_permissions::Filemode] $dir_mode   = undef,
+  Optional[String[1]]                            $owner      = undef,
+  Optional[String[1]]                            $group      = undef,
 ) {
 
   if $facts['os']['family'] == 'windows' {
@@ -28,38 +27,62 @@ define recursive_file_permissions (
     fail('At least one of file_mode, dir_mode, owner, or group is required')
   }
 
-  Exec {
+  # Define the find arguments to find and fix any of the permissions we want to
+  # recursively manage. Each element defines:
+  # 
+  #   - input. The param this relates to. If not undef, the check will be used.
+  #   - find.  String.  Find args that will identify files in need of fixing.
+  #   - fix.   String.  Find -exec command to fix identified files.
+  #
+  $validators = [
+    { input  => $file_mode,
+      find   => shellquote('(', '-type', 'f', '!', '-perm', $file_mode, ')'),
+      fix    => shellquote('-exec', 'chmod', '-c', $file_mode, '{}', ';'),
+    },
+    { input => $dir_mode,
+      find  => shellquote('(', '-type', 'd', '!', '-perm', $dir_mode, ')'),
+      fix   => shellquote('-exec', 'chmod', '-c', $dir_mode, '{}', ';'),
+    },
+    { input => $owner,
+      find  => shellquote('(', '!', '-user', $owner, ')'),
+      fix   => shellquote('-exec', 'chown', '-c', $owner, '{}', ';'),
+    },
+    { input => $group,
+      find  => shellquote('(', '!', '-group', $group, ')'),
+      fix   => shellquote('-exec', 'chgrp', '-c', $group, '{}', ';'),
+    },
+  ]
+
+  $shellsafe_dir = shellquote($target_dir)
+
+  # Build a set of find arguments that will identify if ANY file is out of
+  # sync, on any of the criteria defined by the validators.
+  $onlyif_find_args = $validators.reduce([]) |$arr,$validator| {
+    $validator[input] ? {
+      undef   => $arr,
+      default => $arr << $validator[find]
+    }
+  }.recursive_file_permissions::join(' -or ')
+
+  # This will become the onlyif commmand to run.
+  $onlyif  = "find ${shellsafe_dir} ${onlyif_find_args} | grep '.*'"
+
+  # Build an &&-joined command series to run that will find and fix any
+  # deviation from the desired state of any validator.
+  $command = $validators.reduce([]) |$arr,$validator| {
+    $validator[input] ? {
+      undef   => $arr,
+      default => $arr << "find ${shellsafe_dir} '(' ${validator[find]} ')' ${validator[fix]}"
+    }
+  }.recursive_file_permissions::join(' && ')
+
+  # The result is a single Exec that finds and fixes all managed permissions,
+  # recursively, idempotently.
+  exec { "recursive_file_permissions:${target_dir}":
     path      => $facts['path'],
     logoutput => true,
-    loglevel  => 'info',
+    onlyif    => $onlyif,
+    command   => $command,
   }
 
-  if $dir_mode {
-    exec { "Set perms of ${target_dir} directories to ${dir_mode}":
-      command => "find ${target_dir}/ -type d ! -perm ${dir_mode} -exec chmod -c ${dir_mode} {} \\;",
-      onlyif  => "find ${target_dir}/ -type d ! -perm ${dir_mode} | grep '.*'",
-    }
-  }
-  if $file_mode {
-    exec { "Set perms of ${target_dir} contents to ${file_mode}":
-      command => "find ${target_dir}/ -type f ! -perm ${file_mode} -exec chmod -c ${file_mode} {} \\;",
-      onlyif  => "find ${target_dir}/ -type f ! -perm ${file_mode} | grep '.*'",
-    }
-  }
-  if $owner and $group {
-    exec { "Set owner and group of ${target_dir} contents to ${owner}:${group}":
-      command => "find ${target_dir}/ \\( ! -user ${owner} -or ! -group ${group} \\) -exec chown ${owner}:${group} -c {} \\;",
-      onlyif  => "find ${target_dir}/ \\( ! -user ${owner} -or ! -group ${group} \\) | grep '.*'",
-    }
-  } elsif $owner {
-    exec { "Set owner of ${target_dir} contents to ${owner}":
-      command => "find ${target_dir}/ \\( ! -user ${owner} \\) -exec chown ${owner} -c {} \\;",
-      onlyif  => "find ${target_dir}/ \\( ! -user ${owner} \\) | grep '.*'",
-    }
-  } elsif $group {
-    exec { "Set group of ${target_dir} contents to ${group}":
-      command => "find ${target_dir}/ \\( ! -group ${group} \\) -exec chgrp ${group} -c {} \\;",
-      onlyif  => "find ${target_dir}/ \\( ! -group ${group} \\) | grep '.*'",
-    }
-  }
 }
