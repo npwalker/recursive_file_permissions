@@ -1,8 +1,8 @@
 # recursive_file_permissions
 #
-# A description of what this defined type does
+# A defined type for changing file and directory permissions recursively.
 #
-# @summary A short summary of the purpose of this defined type.
+# @summary Manage file permissions recursively.
 #
 # @example
 #   recursive_file_permissions { '/my_dir':
@@ -11,6 +11,7 @@
 #     owner     => 'me',
 #     group     => 'us',
 #    }
+#
 define recursive_file_permissions (
   Recursive_file_permissions::Unixpath           $target_dir  = $title,
   Optional[Recursive_file_permissions::Filemode] $file_mode   = undef,
