@@ -5,7 +5,10 @@
   "summary": "Puppet defined types and functions for managing permissions on large amounts of files",
   "license": "Apache-2.0",
   "source": "https://github.com/npwalker/recursive_file_permissions",
-  "dependencies": [],
+  "project_page": "https://github.com/npwalker/recursive_file_permissions",
+  "dependencies": [
+
+  ],
   "operatingsystem_support": [
     {
       "operatingsystem": "CentOS",
@@ -68,7 +71,7 @@
       "version_requirement": ">= 3.0.0 < 6.0.0"
     }
   ],
-  "pdk-version": "1.4.1",
+  "pdk-version": "1.5.0.pre (gde5476b)",
   "template-url": "file:///opt/puppetlabs/pdk/share/cache/pdk-templates.git",
-  "template-ref": "1.4.1-0-g52adbbb"
+  "template-ref": "heads/master-0-g033771c"
 }
