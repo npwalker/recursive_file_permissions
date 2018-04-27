@@ -7,7 +7,6 @@
   "source": "https://github.com/npwalker/recursive_file_permissions",
   "project_page": "https://github.com/npwalker/recursive_file_permissions",
   "dependencies": [
-
   ],
   "operatingsystem_support": [
     {
@@ -59,16 +58,32 @@
       ]
     },
     {
+      "operatingsystem": "AIX",
+      "operatingsystemrelease": [
+        "6.1",
+        "7.1"
+      ]
+    },
+    {
       "operatingsystem": "Solaris",
       "operatingsystemrelease": [
         "11"
+      ]
+    },
+    {
+      "operatingsystem": "Darwin",
+      "operatingsystemrelease": [
+        "14",
+        "15",
+        "16",
+        "17"
       ]
     }
   ],
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 3.0.0 < 6.0.0"
+      "version_requirement": ">= 4.6.0 < 6.0.0"
     }
   ],
   "pdk-version": "1.5.0.pre (gde5476b)",
