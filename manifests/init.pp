@@ -34,22 +34,27 @@ define recursive_file_permissions(
   #   - find.  String.  Find args that will identify files in need of fixing.
   #   - fix.   String.  Find -exec command to fix identified files.
   #
+  $v = $facts['os']['family'] ? {
+    'Darwin' => '-v', # Doesn't support the -c flag
+    default  => '-c', # Beautifully verbose output
+  }
+
   $validators = [
     { input  => $file_mode,
       find   => shellquote('(', '-type', 'f', '!', '-perm', $file_mode, ')'),
-      fix    => shellquote('-exec', 'chmod', '-c', $file_mode, '{}', ';'),
+      fix    => shellquote('-exec', 'chmod', $v, $file_mode, '{}', ';'),
     },
     { input => $dir_mode,
       find  => shellquote('(', '-type', 'd', '!', '-perm', $dir_mode, ')'),
-      fix   => shellquote('-exec', 'chmod', '-c', $dir_mode, '{}', ';'),
+      fix   => shellquote('-exec', 'chmod', $v, $dir_mode, '{}', ';'),
     },
     { input => $owner,
       find  => shellquote('(', '!', '-user', $owner, ')'),
-      fix   => shellquote('-exec', 'chown', '-c', $owner, '{}', ';'),
+      fix   => shellquote('-exec', 'chown', $v, $owner, '{}', ';'),
     },
     { input => $group,
       find  => shellquote('(', '!', '-group', $group, ')'),
-      fix   => shellquote('-exec', 'chgrp', '-c', $group, '{}', ';'),
+      fix   => shellquote('-exec', 'chgrp', $v, $group, '{}', ';'),
     },
   ]
 

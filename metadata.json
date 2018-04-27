@@ -62,6 +62,15 @@
       "operatingsystemrelease": [
         "11"
       ]
+    },
+    {
+      "operatingsystem": "Darwin",
+      "operatingsystemrelease": [
+        "14",
+        "15",
+        "16",
+        "17"
+      ]
     }
   ],
   "requirements": [
