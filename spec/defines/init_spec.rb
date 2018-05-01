@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'recursive_file_permissions' do
-  let(:title) { '/tmp' }
+  let(:title) { '/tmp/blah' }
   let(:params) do
     {
       'file_mode'  => '0644',
