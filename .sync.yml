@@ -1,7 +1,12 @@
 ---
+mock_with: ':rspec'
+
+.travis.yml:
+  includes:
+    - env: PUPPET_GEM_VERSION="= 4.6.1" CHECK=parallel_spec
+      rvm: 2.1.9
+
 appveyor.yml:
-  delete: true
-.gitlab-ci.yml:
   delete: true
 .project:
   delete: true
