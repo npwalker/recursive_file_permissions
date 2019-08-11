@@ -40,6 +40,13 @@ define recursive_file_permissions(
     default:          { '-c'  } # Beautifully verbose output
   }
 
+  # -h --no-dereference
+  # affect each symbolic link instead of any referenced file
+  # (useful only on systems that can change the ownership/group of a symlink)
+  $h = case $facts['os']['family'] {
+    default: { '-h' }
+  }
+
   $validators = [
     { input  => $file_mode,
       find   => shellquote('(', '-type', 'f', '!', '-perm', $file_mode, ')'),
@@ -51,11 +58,11 @@ define recursive_file_permissions(
     },
     { input => $owner,
       find  => shellquote('(', '!', '-user', $owner, ')'),
-      fix   => "-exec chown ${v} ${shellquote($owner)} {}  \\;",
+      fix   => "-exec chown ${v} ${h} ${shellquote($owner)} {}  \\;",
     },
     { input => $group,
       find  => shellquote('(', '!', '-group', $group, ')'),
-      fix   => "-exec chgrp ${v} ${shellquote($group)} {} \\;",
+      fix   => "-exec chgrp ${v} ${h} ${shellquote($group)} {} \\;",
     },
   ]
 
