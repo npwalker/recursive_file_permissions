@@ -51,11 +51,11 @@ define recursive_file_permissions(
     },
     { input => $owner,
       find  => shellquote('(', '!', '-user', $owner, ')'),
-      fix   => "-exec chown ${v} ${shellquote($owner)} {}  \\;",
+      fix   => "-exec chown -h ${v} ${shellquote($owner)} {}  \\;",
     },
     { input => $group,
       find  => shellquote('(', '!', '-group', $group, ')'),
-      fix   => "-exec chgrp ${v} ${shellquote($group)} {} \\;",
+      fix   => "-exec chgrp -h ${v} ${shellquote($group)} {} \\;",
     },
   ]
 
