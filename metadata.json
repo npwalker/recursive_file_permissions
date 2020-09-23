@@ -6,6 +6,7 @@
   "license": "Apache-2.0",
   "source": "https://github.com/npwalker/recursive_file_permissions",
   "project_page": "https://github.com/npwalker/recursive_file_permissions",
+  "issues_url": "https://github.com/npwalker/recursive_file_permissions/issues",
   "dependencies": [
 
   ],
