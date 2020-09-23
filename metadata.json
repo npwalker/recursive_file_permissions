@@ -1,6 +1,6 @@
 {
   "name": "npwalker-recursive_file_permissions",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "author": "npwalker",
   "summary": "Puppet defined type for managing permissions on large amounts of files",
   "license": "Apache-2.0",
