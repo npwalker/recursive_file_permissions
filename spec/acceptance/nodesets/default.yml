@@ -1,0 +1,10 @@
+---
+HOSTS:
+  testserver:
+    roles:
+      - master
+    platform: ubuntu-20.04-amd64
+    box: ubuntu/focal64
+    hypervisor: vagrant
+CONFIG:
+  type: foss
