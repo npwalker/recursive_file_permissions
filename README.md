@@ -72,6 +72,35 @@ recursive_file_permissions { '/my_dir':
 }
 ```
 
+### Ignoring Paths
+
+Normally you can just specify a file within a managed directory as a separate
+file resource to adjust its permissions separately, but due to the way
+recursive_file_permissions works it's necessary to explicitly ignore paths:
+
+```puppet
+recursive_file_permissions { '/my_dir':
+  owner         => 'me',
+  ignore_paths  => [ '/my_dir/stuff/*' ]
+}
+```
+
+Note that if you want to ignore a directory and its contents both will need
+adding to the list:
+
+```puppet
+ignore_paths => [ '/my_dir/this/', '/my_dir/this/*' ]
+```
+
 ## Development
 
 PRs welcome.
+
+### Testing
+
+```
+# To run spec tests
+bundle exec rake spec
+# To run beaker acceptance tests (requires vagrant)
+bundle exec rake beaker
+```
