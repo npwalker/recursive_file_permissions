@@ -21,6 +21,8 @@ AllCops:
 Metrics/LineLength:
   Description: People have wide screens, use them.
   Max: 200
+  Exclude:
+    - spec/defines/init_spec.rb
 GetText:
   Enabled: false
 GetText/DecorateString:

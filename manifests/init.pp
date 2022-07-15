@@ -6,17 +6,19 @@
 #
 # @example
 #   recursive_file_permissions { '/my_dir':
-#     file_mode => '0644',
-#     dir_mode  => '0744',
-#     owner     => 'me',
-#     group     => 'us',
+#     file_mode    => '0644',
+#     dir_mode     => '0744',
+#     owner        => 'me',
+#     group        => 'us',
+#     ignore_paths => ['/my_dir/ignored/*']
 #    }
 define recursive_file_permissions(
-  Recursive_file_permissions::Unixpath           $target_dir = $title,
-  Optional[Recursive_file_permissions::Filemode] $file_mode  = undef,
-  Optional[Recursive_file_permissions::Filemode] $dir_mode   = undef,
-  Optional[String[1]]                            $owner      = undef,
-  Optional[String[1]]                            $group      = undef,
+  Recursive_file_permissions::Unixpath                  $target_dir   = $title,
+  Optional[Recursive_file_permissions::Filemode]        $file_mode    = undef,
+  Optional[Recursive_file_permissions::Filemode]        $dir_mode     = undef,
+  Optional[String[1]]                                   $owner        = undef,
+  Optional[String[1]]                                   $group        = undef,
+  Optional[Array[Recursive_file_permissions::Unixpath]] $ignore_paths = undef,
 ) {
 
   if $facts['os']['family'] == 'windows' {
@@ -29,7 +31,7 @@ define recursive_file_permissions(
 
   # Define the find arguments to find and fix any of the permissions we want to
   # recursively manage. Each element defines:
-  # 
+  #
   #   - input. The param this relates to. If not undef, the check will be used.
   #   - find.  String.  Find args that will identify files in need of fixing.
   #   - fix.   String.  Find -exec command to fix identified files.
@@ -70,15 +72,23 @@ define recursive_file_permissions(
     }
   }.recursive_file_permissions::join(' -o ')
 
+  $ignore_path_args = case $ignore_paths {
+    undef:   { '' }
+    default: {
+      $ignore_path_join = recursive_file_permissions::join($ignore_paths.map |$path| { shellquote('(', '!', '-path', $path, ')') }, ' -a ')
+      "-a ${ignore_path_join}"
+    }
+  }
+
   # This will become the onlyif commmand to run.
-  $onlyif  = "find ${shellsafe_dir} ${onlyif_find_args} | grep '.*'"
+  $onlyif  = "find ${shellsafe_dir} \"(\" ${onlyif_find_args} \")\" ${ignore_path_args} | grep '.*'"
 
   # Build an &&-joined command series to run that will find and fix any
   # deviation from the desired state of any validator.
   $command = $validators.reduce([]) |$arr,$validator| {
     $validator[input] ? {
       undef   => $arr,
-      default => $arr << "find ${shellsafe_dir} '(' ${validator[find]} ')' ${validator[fix]}"
+      default => $arr << "find ${shellsafe_dir} \"(\" ${validator[find]} \")\" ${ignore_path_args} ${validator[fix]}"
     }
   }.recursive_file_permissions::join(' && ')
 
@@ -90,5 +100,4 @@ define recursive_file_permissions(
     onlyif    => $onlyif,
     command   => $command,
   }
-
 }
