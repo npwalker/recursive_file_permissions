@@ -75,7 +75,7 @@ define recursive_file_permissions(
   $ignore_path_args = case $ignore_paths {
     undef:   { '' }
     default: {
-      $ignore_path_join = join($ignore_paths.map |$path| { shellquote('(', '!', '-path', $path, ')') }, ' -a ')
+      $ignore_path_join = recursive_file_permissions::join($ignore_paths.map |$path| { shellquote('(', '!', '-path', $path, ')') }, ' -a ')
       "-a ${ignore_path_join}"
     }
   }
