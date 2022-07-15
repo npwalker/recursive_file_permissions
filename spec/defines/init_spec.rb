@@ -152,7 +152,6 @@ describe 'recursive_file_permissions' do
           end
         end
       end
-
     end
   end
 end
